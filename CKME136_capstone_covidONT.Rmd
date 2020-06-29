@@ -74,7 +74,11 @@ ggplot(clean, aes(y=PHU)) +
 
 ggplot(clean, aes(y=Date)) + 
   geom_bar(aes(fill = Age,PHU))
-)
+```
+
+```{r}
+lmOutcome = lm(Outcome~Date+Age+Gender+PHU, clean)
+summary(lmOutcome)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
