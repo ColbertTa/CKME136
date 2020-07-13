@@ -89,6 +89,15 @@ ggplot(clean, aes(y=Date)) +
 
 ggplot(clean, aes(x=Month)) + 
   geom_bar(aes(fill = Outcome))
+
+ggplot(clean, aes(x=Month)) + 
+  geom_bar(aes(fill = Age))
+
+ggplot(clean, aes(x=Month)) + 
+  geom_bar(aes(fill = Gender))
+
+ggplot(clean, aes(x=Month)) + 
+  geom_bar(aes(fill = PHU))
 ```
 
 ```{r}
@@ -117,7 +126,7 @@ clean$Month <- floor_date(clean$Date, "month")
 str(clean)
 
 glmOutcome = glm(Outcome~Month+Age+Gender+PHU, clean, family=binomial)
-summary(glmOutcome) #Age and Gender are good predictors of Outcome. PHU and Date are not good predictors with linear regression because there are too many data points 
+summary(glmOutcome) #Age and Gender are good predictors of Outcome. Month is a decent predictor of outcome, but not as significant as age or gender. PHU is not a good predictor with logistic regression because there are too many data points 
 
 
 ```
