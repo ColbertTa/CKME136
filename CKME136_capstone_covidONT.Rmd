@@ -15,8 +15,18 @@ library(plyr)
 #tinytex::install_tinytex()
 #install.packages("lubridate")
 library(lubridate)
-
-
+#install.packages("rpart")
+library(rpart)
+#install.packages("rpart.plot")
+library(rpart.plot)
+#install.packages("cvms")
+library(cvms)
+#install.packages("caret")
+library(caret)
+#install.packages("klaR")
+library(klaR)
+#install.packages("dplyr")
+library(dplyr)
 ```
 
 ## R Markdown
@@ -26,10 +36,8 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r data}
-dim(data)
-summary(data)
-
-
+#dim(data)
+#summary(data)
 str(data)
 
 #removing certain factors to clean data
@@ -39,16 +47,20 @@ clean<-clean[!grepl("UNKNOWN", clean$Client_Gender),]
 clean<-clean[!grepl("OTHER", clean$Client_Gender),]
 clean<-clean[!grepl("TRANSGENDER", clean$Client_Gender),]
 
+
 names(clean)[2] <- "Date"
 names(clean)[3] <- "Age"
 names(clean)[4] <- "Gender"
 names(clean)[5] <- "Info"
-names(clean)[6] <- "Outcome"
 names(clean)[8] <- "PHU"
+
 
 clean$Date <- as.Date(clean$Date)
 clean$Month <- floor_date(clean$Date, "month")
 clean$Month <- as.factor(clean$Month)
+
+clean<- clean[,c(1:5,7:14, 6)]
+names(clean)[14] <- "Outcome"
 
 ```
 
@@ -102,19 +114,19 @@ ggplot(clean, aes(x=Month)) +
 
 ```{r}
 #have to re-run the cleaning code, else type conversion doesn't work
-clean<-data[!grepl("Not Resolved", data$Outcome1),]
-clean<-clean[!grepl("Unknown", clean$Age_Group),]
-clean<-clean[!grepl("UNKNOWN", clean$Client_Gender),]
-clean<-clean[!grepl("OTHER", clean$Client_Gender),]
-clean<-clean[!grepl("TRANSGENDER", clean$Client_Gender),]
+#clean<-data[!grepl("Not Resolved", data$Outcome1),]
+#clean<-clean[!grepl("Unknown", clean$Age_Group),]
+#clean<-clean[!grepl("UNKNOWN", clean$Client_Gender),]
+#clean<-clean[!grepl("OTHER", clean$Client_Gender),]
+#clean<-clean[!grepl("TRANSGENDER", clean$Client_Gender),]
 
 #re-naming columns for easier coding
-names(clean)[2] <- "Date"
-names(clean)[3] <- "Age"
-names(clean)[4] <- "Gender"
-names(clean)[5] <- "Info"
-names(clean)[6] <- "Outcome"
-names(clean)[8] <- "PHU"
+#names(clean)[2] <- "Date"
+#names(clean)[3] <- "Age"
+#names(clean)[4] <- "Gender"
+#names(clean)[5] <- "Info"
+#names(clean)[8] <- "PHU"
+#names(clean)[14] <- "Outcome"
 
 clean$Date <- as.Date(clean$Date)
 clean$PHU <- as.numeric(clean$PHU)
@@ -122,13 +134,54 @@ clean$Age <- as.numeric(clean$Age)
 clean$Gender <- as.numeric(clean$Gender)
 clean$Outcome <- ifelse(clean$Outcome == "Resolved",1,0)
 clean$Month <- floor_date(clean$Date, "month")
+clean<- clean[,c(1:13,15,14)]
 
 str(clean)
 
 glmOutcome = glm(Outcome~Month+Age+Gender+PHU, clean, family=binomial)
 summary(glmOutcome) #Age and Gender are good predictors of Outcome. Month is a decent predictor of outcome, but not as significant as age or gender. PHU is not a good predictor with logistic regression because there are too many data points 
+```
+
+```{r}
+#Data splicing
+#dt = sort(sample(1:nrow(clean), nrow(clean)*.7))
+dt = sample(1:nrow(clean), size=ceiling(nrow(clean)*.7),replace=FALSE)
+train<-clean[dt,]
+test<-clean[-dt,]
+
+#glmOutcomeTest = glm(Outcome~Month+Age+Gender+PHU, test, family=binomial)
+#summary(glmOutcomeTest)
+
+#Visualising decision tree
+fit <- rpart(Outcome~Month+Age+Gender+PHU, train, method = 'class')
+rpart.plot(fit, nn=TRUE) 
+
+#Testing the model
+pred <- predict(object=fit,test[-1],type="class") 
 
 
+#Calculating accuracy
+t <- table(clean,pred)
+t
+
+#Confusion matrix
+confusionMatrix(pred,test$Outcome)
+
+# train a naive bayes model
+train$Outcome <- as.factor(train$Outcome)
+u <- NaiveBayes(Outcome~Month+Age+Gender+PHU, data=train)
+
+pred <- predict(object=u,test[-1],type="class")
+predictions <- predict(u, test)
+
+randomForest
+
+(svm)
+
+#balance data set
+
+
+str(test$Outcome)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
