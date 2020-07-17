@@ -157,7 +157,8 @@ fit <- rpart(Outcome~Month+Age+Gender+PHU, train, method = 'class')
 rpart.plot(fit, nn=TRUE) 
 
 #Testing the model
-pred <- predict(object=fit,test[-1],type="class") 
+test$Outcome <- substr(test$Outcome,1,nchar(test$Outcome)-1)
+pred <- predict(object=fit,test,type="class") 
 
 
 #Calculating accuracy
