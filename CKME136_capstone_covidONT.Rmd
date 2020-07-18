@@ -27,6 +27,10 @@ library(caret)
 library(klaR)
 #install.packages("dplyr")
 library(dplyr)
+#install.packages("e1071")
+library(e1071)
+#install.packages("randomForest")
+library(randomForest)
 ```
 
 ## R Markdown
@@ -144,8 +148,9 @@ summary(glmOutcome) #Age and Gender are good predictors of Outcome. Month is a d
 
 ```{r}
 #Data splicing
-#dt = sort(sample(1:nrow(clean), nrow(clean)*.7))
-dt = sample(1:nrow(clean), size=ceiling(nrow(clean)*.7),replace=FALSE)
+set.seed(100)
+dt = sort(sample(1:nrow(clean), nrow(clean)*.7))
+#dt = sample(1:nrow(clean), size=ceiling(nrow(clean)*.7),replace=FALSE)
 train<-clean[dt,]
 test<-clean[-dt,]
 
@@ -155,26 +160,31 @@ test<-clean[-dt,]
 #Visualising decision tree
 fit <- rpart(Outcome~Month+Age+Gender+PHU, train, method = 'class')
 rpart.plot(fit, nn=TRUE) 
+summary(fit)
 
 #Testing the model
-test$Outcome <- substr(test$Outcome,1,nchar(test$Outcome)-1)
-pred <- predict(object=fit,test,type="class") 
+pred <- predict(object=fit,test[-1],type="class")
+#test$Outcome <- substr(test$Outcome,1,nchar(test$Outcome)-1)
+#pred <- predict(object=fit,test,type="class") 
 
 
 #Calculating accuracy
-t <- table(clean,pred)
-t
+t <- table(test$Outcome,pred)
 
 #Confusion matrix
-confusionMatrix(pred,test$Outcome)
+confusionMatrix(t)
+```
 
-# train a naive bayes model
+```{r}
+#train a naive bayes model
 train$Outcome <- as.factor(train$Outcome)
-u <- NaiveBayes(Outcome~Month+Age+Gender+PHU, data=train)
+u <- naiveBayes(Outcome~Month+Age+Gender+PHU, data=train)
+preds <- predict(u, test)
+x <- table(test$Outcome,pred)
+confusionMatrix(x)
+```
 
-pred <- predict(object=u,test[-1],type="class")
-predictions <- predict(u, test)
-
+```{r}
 randomForest
 
 (svm)
