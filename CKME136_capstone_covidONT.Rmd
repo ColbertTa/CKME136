@@ -180,7 +180,7 @@ confusionMatrix(t)
 train$Outcome <- as.factor(train$Outcome)
 u <- naiveBayes(Outcome~Month+Age+Gender+PHU, data=train)
 preds <- predict(u, test)
-x <- table(test$Outcome,pred)
+x <- table(test$Outcome,preds)
 confusionMatrix(x)
 ```
 
