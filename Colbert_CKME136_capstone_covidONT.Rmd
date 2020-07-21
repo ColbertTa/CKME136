@@ -134,5 +134,50 @@ set.seed(100)
 model <- randomForest(Outcome~.,train.balanced)
 model
 ```
+```{r}
+ggplot(clean, aes(y=PHU)) + 
+  geom_bar(aes(fill = Gender))
+
+ggplot(clean, aes(x=Age)) + 
+  geom_bar(aes(fill = Gender))
+
+ggplot(clean, aes(y=Date)) + 
+  geom_bar(aes(fill = Gender))
+
+ggplot(clean, aes(y=Date)) + 
+  geom_bar(aes(fill = Outcome))
+
+ggplot(clean, aes(y=PHU)) + 
+  geom_bar(aes(fill = Outcome))
+
+ggplot(clean, aes(x=Gender)) + 
+  geom_bar(aes(fill = Outcome))
+
+ggplot(clean, aes(x=Age)) + 
+  geom_bar(aes(fill = Outcome))
+
+ggplot(clean, aes(y=Date)) + 
+  geom_bar(aes(fill = PHU))
+
+ggplot(clean, aes(y=PHU)) + 
+  geom_bar(aes(fill = Age))
+
+ggplot(clean, aes(y=Date)) + 
+  geom_bar(aes(fill = Age))
+
+ggplot(clean, aes(x=Month)) + 
+  geom_bar(aes(fill = Outcome))
+
+ggplot(clean, aes(x=Month)) + 
+  geom_bar(aes(fill = Age))
+
+ggplot(clean, aes(x=Month)) + 
+  geom_bar(aes(fill = Gender))
+
+ggplot(clean, aes(x=Month)) + 
+  geom_bar(aes(fill = PHU))
+
+```
+
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
