@@ -135,6 +135,19 @@ model <- randomForest(Outcome~.,train.balanced)
 model
 ```
 ```{r}
+clean<-data[!grepl("Not Resolved", data$Outcome1),]
+clean<-clean[!grepl("Unknown", clean$Age_Group),]
+clean<-clean[!grepl("UNKNOWN", clean$Client_Gender),]
+clean<-clean[!grepl("OTHER", clean$Client_Gender),]
+clean<-clean[!grepl("TRANSGENDER", clean$Client_Gender),]
+
+
+names(clean)[2] <- "Date"
+names(clean)[3] <- "Age"
+names(clean)[4] <- "Gender"
+names(clean)[6] <- "Outcome"
+names(clean)[8] <- "PHU"
+
 ggplot(clean, aes(y=PHU)) + 
   geom_bar(aes(fill = Gender))
 
@@ -176,6 +189,7 @@ ggplot(clean, aes(x=Month)) +
 
 ggplot(clean, aes(x=Month)) + 
   geom_bar(aes(fill = PHU))
+
 
 ```
 
