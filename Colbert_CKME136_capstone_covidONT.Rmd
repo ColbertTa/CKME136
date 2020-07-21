@@ -132,8 +132,12 @@ y
 #RandomForest
 set.seed(100)
 model <- randomForest(Outcome~.,train.balanced)
+predx <- predict(model, test)
+x <- table(test$Outcome,predx)
+x
 model
 ```
+
 ```{r}
 clean<-data[!grepl("Not Resolved", data$Outcome1),]
 clean<-clean[!grepl("Unknown", clean$Age_Group),]
