@@ -59,6 +59,8 @@ names(clean)[3] <- "Age"
 names(clean)[4] <- "Gender"
 names(clean)[6] <- "Outcome"
 names(clean)[8] <- "PHU"
+
+clean <- clean[c('Date', 'Age', 'Gender', 'PHU', 'Outcome')]
 ```
 
 ## Including Plots
@@ -98,10 +100,9 @@ clean$PHU = factor(clean$PHU)
 #Data splicing
 set.seed(100)
 dt = sort(sample(1:nrow(clean), nrow(clean)*.7))
-clean.simple <- clean[c('Month', 'Age', 'Gender', 'PHU', 'Outcome')]
 
-train<-clean.simple[dt,]
-test<-clean.simple[-dt,]
+train<-clean[dt,]
+test<-clean[-dt,]
 
 #train a naive bayes model
 
