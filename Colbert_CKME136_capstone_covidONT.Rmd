@@ -33,6 +33,11 @@ library(e1071)
 library(randomForest)
 #install.packages("ROSE")
 library(ROSE)
+#install.packages("Hmisc")
+library(Hmisc)
+#install.packages("corrplot")
+library(corrplot)
+
 ```
 
 ## R Markdown
@@ -44,7 +49,7 @@ When you click the **Knit** button a document will be generated that includes bo
 ```{r data}
 #dim(data)
 #summary(data)
-str(data)
+#str(data)
 
 #removing certain factors to clean data
 clean<-data[!grepl("Not Resolved", data$Outcome1),]
@@ -110,7 +115,7 @@ test<-clean[-dt,]
 train.balanced <- ROSE(Outcome~Month+Age+Gender+PHU, data = train, seed = 100)$data
 table(train.balanced$Outcome)
 
-u <- naiveBayes(Outcome~., data=train.balanced)
+u <- naiveBayes(Outcome~PHU, data=train.balanced)
 pred <- predict(u, test)
 x <- table(test$Outcome,pred)
 x
@@ -145,12 +150,14 @@ clean<-clean[!grepl("UNKNOWN", clean$Client_Gender),]
 clean<-clean[!grepl("OTHER", clean$Client_Gender),]
 clean<-clean[!grepl("TRANSGENDER", clean$Client_Gender),]
 
-
 names(clean)[2] <- "Date"
 names(clean)[3] <- "Age"
 names(clean)[4] <- "Gender"
 names(clean)[6] <- "Outcome"
 names(clean)[8] <- "PHU"
+
+clean$Date <- as.Date(clean$Date)
+clean$Month <- floor_date(clean$Date, "month")  
 
 ggplot(clean, aes(y=PHU)) + 
   geom_bar(aes(fill = Gender))
@@ -193,8 +200,25 @@ ggplot(clean, aes(x=Month)) +
 
 ggplot(clean, aes(x=Month)) + 
   geom_bar(aes(fill = PHU))
+```
 
+```{r}
+clean <- clean[c('Month', 'Age', 'Gender', 'PHU', 'Outcome')]
+clean$Outcome = as.numeric(clean$Outcome)  
+clean$Month = as.numeric(clean$Month)
+clean$Gender = as.numeric(clean$Gender)
+clean$Age = as.numeric(clean$Age)
+clean$PHU = as.numeric(clean$PHU)
 
+res <- cor(clean, method = c("pearson"))
+res
+corrplot(res)
+
+clean.rcorr = rcorr(as.matrix(clean))
+clean.rcorr
+
+palette = colorRampPalette(c("green", "red")) (20)
+heatmap(x = res, col = palette, symm = TRUE)
 ```
 
 
